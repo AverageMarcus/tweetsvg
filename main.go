@@ -13,20 +13,30 @@ import (
 	"time"
 
 	"github.com/ChimeraCoder/anaconda"
+	"github.com/joho/godotenv"
 )
 
 var (
 	api *anaconda.TwitterApi
 
-	port = os.Getenv("PORT")
-
 	tweetDateLayout = "Mon Jan 2 15:04:05 -0700 2006"
 
-	accessToken       = os.Getenv("ACCESS_TOKEN")
-	accessTokenSecret = os.Getenv("ACCESS_TOKEN_SECRET")
-	consumerKey       = os.Getenv("CONSUMER_KEY")
-	consumerSecret    = os.Getenv("CONSUMER_SECRET")
+	port              string
+	accessToken       string
+	accessTokenSecret string
+	consumerKey       string
+	consumerSecret    string
 )
+
+func init() {
+	godotenv.Load(os.Getenv("DOTENV_DIR") + ".env")
+
+	port = os.Getenv("PORT")
+	accessToken = os.Getenv("ACCESS_TOKEN")
+	accessTokenSecret = os.Getenv("ACCESS_TOKEN_SECRET")
+	consumerKey = os.Getenv("CONSUMER_KEY")
+	consumerSecret = os.Getenv("CONSUMER_SECRET")
+}
 
 func main() {
 	if accessToken == "" || accessTokenSecret == "" || consumerKey == "" || consumerSecret == "" {
