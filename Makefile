@@ -39,7 +39,7 @@ docker-publish:
 
 .PHONY: run # Run the application
 run:
-	@go run main.go@npm start
+	@go run main.go
 
 .PHONY: ci # Perform CI specific tasks to perform on a pull request
 ci:
