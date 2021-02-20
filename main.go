@@ -116,7 +116,6 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 			ParseFiles("tweet.svg.tmpl"))
 
 	w.Header().Set("Content-type", "image/svg+xml")
-	w.Header().Set("content-encoding", "br")
 	err = t.Execute(w, tweet)
 	if err != nil {
 		fmt.Println(err)
