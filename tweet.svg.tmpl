@@ -16,14 +16,14 @@
 		.tweetsvg.reply{font-size:15px;color:rgb(110, 118, 125);}
 	</style>
 	<blockquote class="tweetsvg" xmlns="http://www.w3.org/1999/xhtml">
-	<a class="tweetsvg" href="https://twitter.com/{{ .User.ScreenName }}/"><img class="avatar-tweetsvg" alt="" src="data:image/jpeg;base64,{{ base64 .User.ProfileImageUrlHttps }}" /></a>
+	<a rel="noopener" target="_blank" class="tweetsvg" href="https://twitter.com/{{ .User.ScreenName }}/"><img class="avatar-tweetsvg" alt="" src="data:image/jpeg;base64,{{ base64 .User.ProfileImageUrlHttps }}" /></a>
 
-		<a class="tweetsvg" href="https://twitter.com/{{ .User.ScreenName }}/"><h1 class="tweetsvg">{{ .User.Name }}</h1></a>
+		<a rel="noopener" target="_blank" class="tweetsvg" href="https://twitter.com/{{ .User.ScreenName }}/"><h1 class="tweetsvg">{{ .User.Name }}</h1></a>
 
-		<a class="tweetsvg" href="https://twitter.com/{{ .User.ScreenName }}/"><h2 class="tweetsvg">@{{ .User.ScreenName }}</h2></a>
+		<a rel="noopener" target="_blank" class="tweetsvg" href="https://twitter.com/{{ .User.ScreenName }}/"><h2 class="tweetsvg">@{{ .User.ScreenName }}</h2></a>
 
 		{{ if .InReplyToScreenName }}
-		<p class="tweetsvg reply">Replying to <a href="https://twitter.com/{{ .InReplyToScreenName }}/">@{{ .InReplyToScreenName }}</a></p>
+		<p class="tweetsvg reply">Replying to <a rel="noopener" target="_blank" href="https://twitter.com/{{ .InReplyToScreenName }}/">@{{ .InReplyToScreenName }}</a></p>
 		{{ end }}
 
 		<p class="tweetsvg text">{{ html .FullText }}</p>
@@ -31,12 +31,12 @@
 		{{ if .ExtendedEntities }}
 		{{ range .ExtendedEntities.Media }}
 
-			<a href="{{ .Media_url_https }}" target="_blank"><img class="media-tweetsvg" width="{{ .Sizes.Small.W }}" src="data:image/jpeg;base64,{{ base64 .Media_url }}" alt="{{ .ExtAltText }}"/></a>
+			<a rel="noopener" target="_blank" href="{{ .Media_url_https }}" target="_blank"><img class="media-tweetsvg" width="{{ .Sizes.Small.W }}" src="data:image/jpeg;base64,{{ base64 .Media_url }}" alt="{{ .ExtAltText }}"/></a>
 
 		{{ end }}
 		{{ end }}
 
-		<a class="tweetsvg" href="https://twitter.com/{{ .User.ScreenName }}/status/{{ .Id }}">
+		<a rel="noopener" target="_blank" class="tweetsvg" href="https://twitter.com/{{ .User.ScreenName }}/status/{{ .Id }}">
 			<time class="tweetsvg" datetime="{{ isoDate .CreatedAt }}">{{ humanDate .CreatedAt }}</time>
 		</a>
 	</blockquote>

@@ -75,19 +75,16 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 	for _, emoji := range emojis {
 		emojiCount += len([]byte(emoji)) - 1
 	}
-
-	fmt.Println(tweet.FullText)
-
 	tweet.FullText = tweet.FullText[tweet.DisplayTextRange[0] : tweet.DisplayTextRange[1]+emojiCount]
 
 	for _, user := range tweet.Entities.User_mentions {
-		tweet.FullText = strings.ReplaceAll(tweet.FullText, "@"+user.Screen_name, fmt.Sprintf("<a href=\"https://twitter.com/%s/\">@%s</a>", user.Screen_name, user.Screen_name))
+		tweet.FullText = strings.ReplaceAll(tweet.FullText, "@"+user.Screen_name, fmt.Sprintf("<a rel=\"noopener\" target=\"_blank\" href=\"https://twitter.com/%s/\">@%s</a>", user.Screen_name, user.Screen_name))
 	}
 	for _, url := range tweet.Entities.Urls {
-		tweet.FullText = strings.ReplaceAll(tweet.FullText, url.Url, fmt.Sprintf("<a href=\"https://twitter.com/%s/\">%s</a>", url.Expanded_url, url.Display_url))
+		tweet.FullText = strings.ReplaceAll(tweet.FullText, url.Url, fmt.Sprintf("<a rel=\"noopener\" target=\"_blank\" href=\"https://twitter.com/%s/\">%s</a>", url.Expanded_url, url.Display_url))
 	}
 	for _, hashtag := range tweet.Entities.Hashtags {
-		tweet.FullText = strings.ReplaceAll(tweet.FullText, "#"+hashtag.Text, fmt.Sprintf("<a href=\"https://twitter.com/hashtag/%s\">#%s</a>", hashtag.Text, hashtag.Text))
+		tweet.FullText = strings.ReplaceAll(tweet.FullText, "#"+hashtag.Text, fmt.Sprintf("<a rel=\"noopener\" target=\"_blank\" href=\"https://twitter.com/hashtag/%s\">#%s</a>", hashtag.Text, hashtag.Text))
 	}
 
 	templateFuncs := template.FuncMap{
