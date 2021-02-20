@@ -31,7 +31,7 @@
 		{{ if .ExtendedEntities }}
 		{{ range .ExtendedEntities.Media }}
 
-			<a rel="noopener" target="_blank" href="{{ .Media_url_https }}" target="_blank"><img class="media-tweetsvg" width="{{ .Sizes.Small.W }}" src="data:image/jpeg;base64,{{ base64 .Media_url }}" alt="{{ .ExtAltText }}"/></a>
+			<a rel="noopener" target="_blank" href="{{ .Media_url_https }}"><img class="media-tweetsvg" width="{{ .Sizes.Small.W }}" src="data:image/jpeg;base64,{{ base64 .Media_url }}" alt="{{ .ExtAltText }}"/></a>
 
 		{{ end }}
 		{{ end }}
