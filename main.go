@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -67,6 +68,28 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	re := regexp.MustCompile(`[\x{1F300}-\x{1F6FF}]`)
+	emojis := re.FindAllString(tweet.FullText, -1)
+
+	emojiCount := 0
+	for _, emoji := range emojis {
+		emojiCount += len([]byte(emoji)) - 1
+	}
+
+	fmt.Println(tweet.FullText)
+
+	tweet.FullText = tweet.FullText[tweet.DisplayTextRange[0] : tweet.DisplayTextRange[1]+emojiCount]
+
+	for _, user := range tweet.Entities.User_mentions {
+		tweet.FullText = strings.ReplaceAll(tweet.FullText, "@"+user.Screen_name, fmt.Sprintf("<a href=\"https://twitter.com/%s/\">@%s</a>", user.Screen_name, user.Screen_name))
+	}
+	for _, url := range tweet.Entities.Urls {
+		tweet.FullText = strings.ReplaceAll(tweet.FullText, url.Url, fmt.Sprintf("<a href=\"https://twitter.com/%s/\">%s</a>", url.Expanded_url, url.Display_url))
+	}
+	for _, hashtag := range tweet.Entities.Hashtags {
+		tweet.FullText = strings.ReplaceAll(tweet.FullText, "#"+hashtag.Text, fmt.Sprintf("<a href=\"https://twitter.com/hashtag/%s\">#%s</a>", hashtag.Text, hashtag.Text))
+	}
+
 	templateFuncs := template.FuncMap{
 		"base64": func(url string) string {
 			res, err := http.Get(url)
@@ -85,6 +108,9 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 			t, _ := time.Parse(tweetDateLayout, date)
 			return t.Format("3:04 PM · Jan 2, 2006")
 		},
+		"html": func(in string) template.HTML {
+			return template.HTML(in)
+		},
 	}
 
 	t := template.Must(
@@ -93,6 +119,7 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 			ParseFiles("tweet.svg.tmpl"))
 
 	w.Header().Set("Content-type", "image/svg+xml")
+	w.Header().Set("content-encoding", "br")
 	err = t.Execute(w, tweet)
 	if err != nil {
 		fmt.Println(err)
