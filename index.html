@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>TweetSVG</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <style>
+    main {
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      flex-direction: column;
+      margin: 0 auto;
+      max-width: 800px;
+      text-align: center;
+      align-items: center;
+    }
+    img {
+      max-width: 100%;
+    }
+    label {
+      width: 100%;
+      font-weight: bold;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+    input, textarea {
+      margin: 1em 0;
+      font-size: 1.2em;
+      padding: 4px;
+      max-width: 600px;
+      width: inherit;
+      font-family: monospace;
+    }
+    textarea {
+      height: 100px;
+    }
+
+    [readonly] {
+      color: #666;
+    }
+
+    @media screen and (max-width: 700px) {
+      label {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>TweetSVG</h1>
+    <label>
+      Tweet URL:
+      <input id="tweetURL" type="text" value="https://twitter.com/Marcus_Noble_/status/1363048182020792325" />
+    </label>
+    <figure>
+      <img id="exampleImage" src="/1363048182020792325" />
+      <figcaption>Preview</figcaption>
+    </figure>
+
+
+    <label>
+      Image Tag:
+      <input type="text" id="imageTagExample" readonly />
+    </label>
+    <label>
+      SVG Tag:
+      <textarea id="svgTagExample" readonly></textarea>
+    </label>
+
+  </main>
+
+  <script>
+    function loadTweet(tweetID) {
+      document.getElementById('exampleImage').src = `/${tweetID}`;
+      document.getElementById('imageTagExample').value = `<img src="https://tweet.cluster.fun/${tweetID}" />`;
+      fetch(`/${tweetID}`)
+        .then(res => res.text())
+        .then(svgSrc => {
+          document.getElementById('svgTagExample').innerText = svgSrc;
+        })
+    }
+
+    document.getElementById('tweetURL').addEventListener('change', function(e) {
+      let parts = e.target.value.split("/");
+      let tweetID = parts[parts.length-1];
+      loadTweet(tweetID);
+    });
+
+document.getElementById('imageTagExample').addEventListener('click', function(e) {
+  e.target.select();
+  document.execCommand("copy");
+});
+
+document.getElementById('svgTagExample').addEventListener('click', function(e) {
+  e.target.select();
+  document.execCommand("copy");
+});
+
+    loadTweet('1363048182020792325')
+  </script>
+</body>
+</html>
