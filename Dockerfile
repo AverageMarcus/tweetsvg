@@ -11,6 +11,6 @@ FROM scratch
 WORKDIR /app/
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /app/tweetsvg /app/tweetsvg
-ADD tweet.svg.tmpl .
+ADD tweet.svg.tmpl index.html ./
 
 ENTRYPOINT ["/app/tweetsvg"]
