@@ -5,7 +5,9 @@ import (
 	"encoding/base64"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"regexp"
@@ -14,6 +16,7 @@ import (
 	"time"
 
 	"github.com/ChimeraCoder/anaconda"
+	strip "github.com/grokify/html-strip-tags-go"
 	"github.com/joho/godotenv"
 )
 
@@ -50,7 +53,14 @@ func main() {
 		port = "8080"
 	}
 
-	http.HandleFunc("/", getTweet)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if len(r.URL.Path) > 1 {
+			getTweet(w, r)
+		} else {
+			body, _ := ioutil.ReadFile("index.html")
+			w.Write(body)
+		}
+	})
 	fmt.Println("Server started at port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
@@ -87,6 +97,8 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 		tweet.FullText = strings.ReplaceAll(tweet.FullText, "#"+hashtag.Text, fmt.Sprintf("<a rel=\"noopener\" target=\"_blank\" href=\"https://twitter.com/hashtag/%s\">#%s</a>", hashtag.Text, hashtag.Text))
 	}
 
+	tweet.FullText = strings.ReplaceAll(tweet.FullText, "\n", "<br />")
+
 	templateFuncs := template.FuncMap{
 		"base64": func(url string) string {
 			res, err := http.Get(url)
@@ -107,6 +119,25 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 		},
 		"html": func(in string) template.HTML {
 			return template.HTML(in)
+		},
+		"calculateHeight": func(tweet anaconda.Tweet) string {
+			height := 205.0
+
+			lines := math.Floor(float64(len(strip.StripTags(tweet.FullText))) / 40)
+			height += lines * 20
+
+			if tweet.InReplyToScreenName != "" {
+				height += 45
+			}
+
+			height += float64(strings.Count(tweet.FullText, "<br />") * 20)
+
+			for _, pic := range tweet.ExtendedEntities.Media {
+				ratio := float64(pic.Sizes.Small.W) / 464
+				height += float64(pic.Sizes.Small.H) / ratio
+			}
+
+			return fmt.Sprintf("%dpx", int64(height))
 		},
 	}
 
