@@ -2,13 +2,12 @@
 
 Generate an SVG for a given Tweet ID
 
+Available at https://tweet.cluster.fun/
+
 ## Features
 
-## Install
-
-```sh
-
-```
+* Provide the ID of a tweet and have it render as an SVG for use in an `<img>` tag.
+* No JavaScript required
 
 ## Building from source
 
@@ -23,8 +22,6 @@ Standalone:
 ```sh
 make build
 ```
-
-## Resources
 
 ## Contributing
 
