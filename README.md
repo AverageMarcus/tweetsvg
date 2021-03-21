@@ -1,4 +1,4 @@
-# TweetSVG
+![TweetSVG](logo.png)
 
 Generate an SVG for a given Tweet ID
 
