@@ -2,9 +2,15 @@
 
 Generate an SVG for a given Tweet ID
 
-![](https://tweet.cluster.fun/1363048182020792325)
-
 Available at https://tweet.cluster.fun/
+
+## Example 
+
+```
+<img src="https://tweet.cluster.fun/1363048182020792325" />
+```
+
+![](https://tweet.cluster.fun/1363048182020792325)
 
 ## Features
 
