@@ -3,75 +3,94 @@
 <head>
   <meta charset='utf-8'>
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TweetSVG</title>
-  <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+  <meta property="og:title" content="TweetSVG">
+  <meta property="og:site_name" content="TweetSVG">
+  <meta property="og:url" content="https://tweet.cluster.fun">
+  <meta property="og:description" content="Generate an SVG for a given Tweet ID">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSItNTAwIC0xMDAgMTUxMiA3MTIiPgogIDxnPgogICAgPHBhdGggZD0iTTYxIDE0MGMtOCAwLTE0LTYtMTQtMTRWNjFjMC04IDYtMTQgMTQtMTRoNjVhMTQgMTQgMCAxMTAgMjhINzV2NTFjMCA4LTYgMTQtMTQgMTR6IiBmaWxsPSIjZWY3MWE4Ii8+CiAgICA8cGF0aCBkPSJNNDUxIDQ2NWgtNjVhMTQgMTQgMCAxMTAtMjhoNTF2LTUxYTE0IDE0IDAgMTEyOCAwdjY1YzAgOC02IDE0LTE0IDE0eiIgZmlsbD0iI2VmNzFhOCIvPgogICAgPHBhdGggZD0iTTQ5OCA1MTJIMTRjLTggMC0xNC02LTE0LTE0VjE0QzAgNiA2IDAgMTQgMGg0ODRjOCAwIDE0IDYgMTQgMTR2NDg0YzAgOC02IDE0LTE0IDE0ek0yOCA0ODRoNDU2VjI4SDI4djQ1NnoiIGZpbGw9IiNlZjcxYTgiLz4KICA8L2c+CiAgPHBhdGggZD0iTTM2OSAyNjZjOC0yMSAxMi00NCAxMi02NXYtMWMwLTQgMi03IDUtOSAxMC05IDI2LTMwIDI2LTMwbC00MC02Yy0yIDAtMTItMTEtMTQtMTJhNjggNjggMCAwMC02Ni0xNGMtMjIgNy0zOSAyNS00NCA0Ny0yIDgtMyAxNy0yIDI1djJhMyAzIDAgMDEtMiAxIDE3OCAxNzggMCAwMS0xMjItNjVjLTItMi01LTItNiAwYTY4IDY4IDAgMDAxMSA4MmMtNS0xLTExLTMtMTUtNi0zLTEtNiAxLTYgMyAwIDI4IDE2IDUyIDQwIDYzYTcwIDcwIDAgMDEtMTMtMWMtMy0xLTUgMi00IDQgOCAyNCAyOSA0MiA1MyA0Ni0yMCAxNC00NCAyMS02OSAyMWgtOGMtMyAwLTUgMi01IDQtMSAzIDAgNSAyIDYgMjkgMTcgNjEgMjUgOTQgMjVhMTc2IDE3NiAwIDAwMTM4LTYxIiBmaWxsPSIjNzFjYWQxIi8+CiAgPHBhdGggZD0iTTE5NiA0MDFjLTM2IDAtNzAtMTAtMTAxLTI4LTctNC0xMS0xMy05LTIxIDItOSAxMC0xNSAxOS0xNWg4YzEyIDAgMjQtMiAzNS01YTgyIDgyIDAgMDEtMzMtNDRjLTEtMy0xLTggMS0xMWE4MiA4MiAwIDAxLTI0LTU5YzAtNSAzLTEwIDctMTRhODIgODIgMCAwMTUtNzIgMTggMTggMCAwMTI5LTIgMTY0IDE2NCAwIDAwOTkgNThsMi0xNWE4MCA4MCAwIDAxNzktNjIgODIgODIgMCAwMTU3IDIzbDcgNyAzOCA2YTE0IDE0IDAgMDE5IDIzYy0yIDItMTcgMjEtMjkgMzEgMCAyMy00IDQ3LTEzIDcwYTE0IDE0IDAgMTEtMjYtMTBjNy0yMCAxMS00MCAxMS02MHYtMWMwLTggNC0xNSAxMC0yMGw5LTktMTUtMmMtNi0xLTExLTUtMjEtMTRsLTEtMmE1MyA1MyAwIDAwLTUzLTExYy0xNyA2LTMwIDIwLTM0IDM3LTIgNy0yIDE0LTIgMjBhMTcgMTcgMCAwMS0xOCAxOSAxOTEgMTkxIDAgMDEtMTIwLTU3IDU0IDU0IDAgMDAxNSA1MCAxNCAxNCAwIDAxLTE0IDI0YzQgMTQgMTUgMjYgMjkgMzNhMTQgMTQgMCAwMS0yIDI2YzggMTIgMjEgMjAgMzUgMjJhMTQgMTQgMCAwMTUgMjZjLTE1IDEwLTMyIDE3LTUwIDIxYTE3NCAxNzQgMCAwMDEyOS02YzIxLTEwIDM5LTIzIDU0LTQxYTE0IDE0IDAgMTEyMSAxOSAxOTAgMTkwIDAgMDEtMTQ4IDY2em00OS0yMTF6bTEyNy0yMXptLTI2MS0yMXptMjYyLTh6IiBmaWxsPSIjZWY3MWE4Ii8+Cjwvc3ZnPgo=">
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:creator" content="@Marcus_Noble_" />
+
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css">
+  <link rel="stylesheet" href="https://cdn.githubraw.com/AverageMarcus/milligram/fb7f0444/dist/milligram.min.css">
   <style>
-    main {
-      font-family: Arial, Helvetica, sans-serif;
+    body {
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      margin: 0 auto;
-      max-width: 800px;
-      text-align: center;
-      align-items: center;
+      justify-content: space-between;
     }
     img {
       max-width: 100%;
     }
-    label {
-      width: 100%;
-      font-weight: bold;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-    }
-    input, textarea {
-      margin: 1em 0;
-      font-size: 1.2em;
-      padding: 4px;
-      max-width: 600px;
-      width: inherit;
-      font-family: monospace;
-    }
     textarea {
-      height: 100px;
-    }
-
-    [readonly] {
-      color: #666;
-    }
-
-    @media screen and (max-width: 700px) {
-      label {
-        flex-direction: column;
-      }
+      height: 200px;
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>TweetSVG</h1>
-    <label>
-      Tweet URL:
-      <input id="tweetURL" type="text" value="https://twitter.com/Marcus_Noble_/status/1363048182020792325" />
-    </label>
-    <figure>
-      <img id="exampleImage" src="/1363048182020792325" />
-      <figcaption>Preview</figcaption>
-    </figure>
+  <div class="container">
+    <h1 class="heading-fancy">
+      TweetSVG
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" style="height: 50px;"><g><path d="M61 140c-8 0-14-6-14-14V61c0-8 6-14 14-14h65a14 14 0 110 28H75v51c0 8-6 14-14 14z" fill="#ef71a8"/><path d="M451 465h-65a14 14 0 110-28h51v-51a14 14 0 1128 0v65c0 8-6 14-14 14z" fill="#ef71a8"/><path d="M498 512H14c-8 0-14-6-14-14V14C0 6 6 0 14 0h484c8 0 14 6 14 14v484c0 8-6 14-14 14zM28 484h456V28H28v456z" fill="#ef71a8"/></g><path d="M369 266c8-21 12-44 12-65v-1c0-4 2-7 5-9 10-9 26-30 26-30l-40-6c-2 0-12-11-14-12a68 68 0 00-66-14c-22 7-39 25-44 47-2 8-3 17-2 25v2a3 3 0 01-2 1 178 178 0 01-122-65c-2-2-5-2-6 0a68 68 0 0011 82c-5-1-11-3-15-6-3-1-6 1-6 3 0 28 16 52 40 63a70 70 0 01-13-1c-3-1-5 2-4 4 8 24 29 42 53 46-20 14-44 21-69 21h-8c-3 0-5 2-5 4-1 3 0 5 2 6 29 17 61 25 94 25a176 176 0 00138-61" fill="#71cad1"/><path d="M196 401c-36 0-70-10-101-28-7-4-11-13-9-21 2-9 10-15 19-15h8c12 0 24-2 35-5a82 82 0 01-33-44c-1-3-1-8 1-11a82 82 0 01-24-59c0-5 3-10 7-14a82 82 0 015-72 18 18 0 0129-2 164 164 0 0099 58l2-15a80 80 0 0179-62 82 82 0 0157 23l7 7 38 6a14 14 0 019 23c-2 2-17 21-29 31 0 23-4 47-13 70a14 14 0 11-26-10c7-20 11-40 11-60v-1c0-8 4-15 10-20l9-9-15-2c-6-1-11-5-21-14l-1-2a53 53 0 00-53-11c-17 6-30 20-34 37-2 7-2 14-2 20a17 17 0 01-18 19 191 191 0 01-120-57 54 54 0 0015 50 14 14 0 01-14 24c4 14 15 26 29 33a14 14 0 01-2 26c8 12 21 20 35 22a14 14 0 015 26c-15 10-32 17-50 21a174 174 0 00129-6c21-10 39-23 54-41a14 14 0 1121 19 190 190 0 01-148 66zm49-211zm127-21zm-261-21zm262-8z" fill="#ef71a8"/></svg>
+    </h1>
+
+    <blockquote>
+      Generate an SVG for a given Tweet ID
+    </blockquote>
+
+    <p>
+      Enter the URL or ID of a tweet to have an SVG generated for it, no JavaScript required!
+    </p>
 
 
-    <label>
-      Image Tag:
-      <input type="text" id="imageTagExample" readonly />
-    </label>
-    <label>
-      SVG Tag:
-      <textarea id="svgTagExample" readonly></textarea>
-    </label>
+    <div class="row">
+      <form class="column column-80 column-offset-10">
+        <fieldset>
+          <label>
+            Tweet URL:
+            <input id="tweetURL" type="text" value="https://twitter.com/Marcus_Noble_/status/1363048182020792325" />
+          </label>
+          <figure class="text-center">
+            <img id="exampleImage" src="/1363048182020792325" />
+            <figcaption>Preview</figcaption>
+          </figure>
 
-  </main>
+
+          <label>
+            Image Tag:
+            <input type="text" id="imageTagExample" readonly />
+          </label>
+          <label>
+            SVG Tag:
+            <textarea id="svgTagExample" readonly></textarea>
+          </label>
+        </fieldset>
+      </form>
+    </div>
+
+    <div>
+      Source code available on <a href="https://github.com/AverageMarcus/tweetsvg" target="_blank" rel="noopener noreferrer">GitHub</a>, <a href="https://gitlab.com/AverageMarcus/tweetsvg" target="_blank" rel="noopener noreferrer">GitLab</a>, <a href="https://bitbucket.org/AverageMarcus/tweetsvg/" target="_blank" rel="noopener noreferrer">Bitbucket</a> & <a href="https://git.cluster.fun/AverageMarcus/tweetsvg" target="_blank" rel="noopener noreferrer">my own Gitea server</a>.
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="column column-60 column-offset-20">
+        <footer>
+          Made with
+          <svg height="20" class="fill-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 449.3 449.3" xmlns:xlink="http://www.w3.org/1999/xlink"><title>love</title><g><path d="M0 162.7c1.5-7.7 2.7-15.4 4.5-23A125.5 125.5 0 0132 88a136.3 136.3 0 0162.7-40.6c8.3-2.9 17.7-3.2 26.6-3.7a134 134 0 0155.6 6.6c14.9 5.7 30 11 41 23.6 17-20 36.4-36.3 60-46.4 12-5.2 25.7-6.9 38.7-9.4a79.4 79.4 0 0140.3 3.2 96.4 96.4 0 0143.2 26 209.8 209.8 0 0137.8 55.4 133.2 133.2 0 0111 65.7c-3.2 42.2-21 79-41.5 114.8a431.2 431.2 0 01-47.6 64.3c-19.6 23-39.7 45.7-59.6 68.5-3.7 4.3-7.2 9-11.7 12.4-7.3 5.4-15.9 4.9-23.8 1.5-21.9-9.2-43.8-18.5-65.3-28.5a520.1 520.1 0 01-98-58.7c-28.2-21.5-55.5-44.3-74-75.3a183.8 183.8 0 01-25-61.4c-1-6.2-1.6-12.6-2.4-18.8v-24.5zM138 281l2.5.1c0 2.1.3 4.3 0 6.3l-9 55.5c-.3 1.6 0 4.2 1 5 5.8 4.1 11.8 7.8 17.9 11.8l11-59.7 2.5.3c3.7 21.6-6.3 42-7.6 63.5l19.4 9.6c.5-18 2.2-35 6.9-51.6 1.3 4 1.5 8 1.2 12-.7 11.2-1 22.5-2.6 33.7-1 7.3 1.9 10.6 8 13.3 27 11.7 54.1 23.5 81 35.7 5.5 2.5 8.8 1.5 12.6-2.9 12.5-14.4 25.7-28.1 38-42.7 17.2-20.2 34.5-40.5 50.5-61.7 29.5-39.2 52.7-81.7 61-131 3.6-21.7 2-43-5.6-63.5a176 176 0 00-33.9-54.5 84.8 84.8 0 00-38-26 91.2 91.2 0 00-44.2-2.5c-13 2-25.6 5.1-37.2 12.3a208.6 208.6 0 00-45.9 37c-5.7 6.3-7.8 6.4-15 1.4-5.7-4-11-8.8-17.2-11.9-15.1-7.5-30.7-14.4-48-14.9-13.7-.4-28-2-41.2 1-36 8.4-62.7 30-80.3 62.8a111 111 0 00-11.7 56.6c.3 10 1.4 20 2.2 29.9 7-18.9 11-38.3 19.7-56.3.6 3 .6 6 0 8.7l-14.5 53.2c-.7 2.6-2 5.7-1.2 8 2.7 8.4 6.2 16.6 9.4 24.8 0-20 13.7-63.9 21.8-66.8 0 .6.3 1.1.2 1.6a11936 11936 0 01-17 64c-.3 1.4-1.6 2.6-2.9 4.5l9.7 17a573 573 0 0120-67.3l2.9.7c-1 5-1.5 10-2.8 14.9-4.7 17.2-9.6 34.3-14.2 51.5-.7 2.5-1.5 6-.3 7.8 3.6 5.6 8 10.7 12.4 16.1 1.8-8.6 3.1-16.6 5.2-24.4 3.1-11.5 6.6-22.9 10.2-34.3.8-2.6 2.7-5 4-7.4l2 .8c-.1 1.6-.1 3.4-.5 5l-12.2 47.4c-4.6 17.9-4.3 18.9 7.8 29.4 2.2 1.8 4.5 3.5 7 5.3 3.7-31 12.5-64.7 18.4-68-.3 3.5-.3 6.6-.9 9.6l-12.7 58.8c-.3 1.2-.7 3-.1 3.5 4.7 4.4 9.6 8.6 14.5 12.9 3.5-21.4 7.6-41.7 13.6-61.6 3.4 8.7.6 17-.8 25.2-1.9 11.6-4.5 23.1-6.5 34.7-.4 2.3-.4 6 1 7 4.8 4.2 10.3 7.4 16 11.3 3.9-21.5 5.5-42.6 12.6-62.5z"/><path d="M323.2 180.5a24 24 0 01-24.5-19.7c-2-9.7.7-20.2 15-27 16.6-7.8 38.3 2.3 41.6 19.5 1.2 6.6-1.6 12.1-6 16.3a35.1 35.1 0 01-26 11z"/><path d="M138.9 167.1a31 31 0 0125 12.7 22 22 0 01-13.6 34.9 29.9 29.9 0 01-31-9.9c-6-7-7.6-15.3-4.1-24.1 3.7-9.5 12-12 21-13.5.8-.2 1.8 0 2.7 0z"/><path d="M233.2 202c-18.5-.4-33.7-13.6-34-29.7 0-4.2.4-8 5.4-8.7 4.5-.7 6.6 2.3 8 6 2.3 6.6 5.5 12.4 12.4 15.4 7.5 3.2 14 1.5 20.4-3.3 6.2-4.7 6.4-11 4.7-17.5-1.4-5.2.4-8.4 4.7-10.2 4.3-1.7 9 1.3 10.9 6.2 7.2 19.8-5.7 34.6-22.8 40.2-3 1-6.5 1-9.7 1.6z"/><path d="M201.2 384.7c-.9-2-2.7-4.2-2.5-6.2 1.2-14 2.8-28.1 4.4-42.2 0-.9.7-1.7 1-2.6l2.6 1.1-3.1 49.1-2.4.8z"/><path d="M222 387.4c-4.8-5.7-5-15-1-37.8 3.1 3 4 30.5 1 37.8z"/><path d="M240.9 361.7l-1.4 20.2c-4.8-3.3-4.6-11.9-.2-20.4l1.6.2z"/><path d="M257.4 380.4c-4.1-5.2-3.7-9.7 1-14.7l-1 14.7z"/></g></svg>
+          by <a href="https://marcusnoble.co.uk" class="fancy-link">Marcus Noble</a>
+        </footer>
+      </div>
+    </div>
+  </div>
 
   <script>
     function loadTweet(tweetID) {
@@ -90,16 +109,17 @@
       loadTweet(tweetID);
     });
 
-document.getElementById('imageTagExample').addEventListener('click', function(e) {
-  e.target.select();
-  document.execCommand("copy");
-});
+    document.getElementById('imageTagExample').addEventListener('click', function(e) {
+      e.target.select();
+      document.execCommand("copy");
+    });
 
-document.getElementById('svgTagExample').addEventListener('click', function(e) {
-  e.target.select();
-  document.execCommand("copy");
-});
+    document.getElementById('svgTagExample').addEventListener('click', function(e) {
+      e.target.select();
+      document.execCommand("copy");
+    });
 
+    // Load example tweet
     loadTweet('1363048182020792325')
   </script>
 </body>

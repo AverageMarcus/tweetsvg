@@ -2,10 +2,10 @@ package main
 
 import (
 	"bytes"
+	"embed"
 	"encoding/base64"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
@@ -19,6 +19,10 @@ import (
 	strip "github.com/grokify/html-strip-tags-go"
 	"github.com/joho/godotenv"
 )
+
+//go:embed index.html tweet.svg.tmpl
+
+var content embed.FS
 
 var (
 	api *anaconda.TwitterApi
@@ -57,7 +61,7 @@ func main() {
 		if len(r.URL.Path) > 1 {
 			getTweet(w, r)
 		} else {
-			body, _ := ioutil.ReadFile("index.html")
+			body, _ := content.ReadFile("index.html")
 			w.Write(body)
 		}
 	})
@@ -144,7 +148,7 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 	t := template.Must(
 		template.New("tweet.svg.tmpl").
 			Funcs(templateFuncs).
-			ParseFiles("tweet.svg.tmpl"))
+			ParseFS(content, "tweet.svg.tmpl"))
 
 	w.Header().Set("Content-type", "image/svg+xml")
 	err = t.Execute(w, tweet)
