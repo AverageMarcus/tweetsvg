@@ -14,6 +14,7 @@
 		.media-tweetsvg{border-radius:2%; max-width:100%;border-radius: 2%; border-style: solid; border-width: .1em; border-color: #ddd;}
 		time.tweetsvg{font-size:15px;margin:0;margin-left: 2px;padding-bottom:1rem;color:rgb(101, 119, 134);text-decoration:none;}
 		.tweetsvg.reply{font-size:15px;color:rgb(110, 118, 125);}
+		.tweetsvg.footer{display:block;}
 	</style>
 	<blockquote class="tweetsvg" xmlns="http://www.w3.org/1999/xhtml">
 	<a rel="noopener" target="_blank" class="tweetsvg" href="https://twitter.com/{{ .User.ScreenName }}/"><img class="avatar-tweetsvg" alt="" src="data:image/jpeg;base64,{{ base64 .User.ProfileImageUrlHttps }}" /></a>
@@ -36,7 +37,7 @@
 		{{ end }}
 		{{ end }}
 
-		<a rel="noopener" target="_blank" class="tweetsvg" href="https://twitter.com/{{ .User.ScreenName }}/status/{{ .Id }}">
+		<a rel="noopener" target="_blank" class="tweetsvg footer" href="https://twitter.com/{{ .User.ScreenName }}/status/{{ .Id }}">
 			<time class="tweetsvg" datetime="{{ isoDate .CreatedAt }}">{{ humanDate .CreatedAt }}</time>
 		</a>
 	</blockquote>

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"html/template"
 	"log"
-	"math"
 	"net/http"
 	"os"
 	"regexp"
@@ -125,20 +124,51 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 			return template.HTML(in)
 		},
 		"calculateHeight": func(tweet anaconda.Tweet) string {
-			height := 205.0
+			height := 64.0 /* Avatar */ + 20 /* footer */ + 46 /* test margin */ + 32 /* margin */
 
-			lines := math.Floor(float64(len(strip.StripTags(tweet.FullText))) / 40)
-			height += lines * 20
+			lineWidth := 0.0
+			tweetText := strings.ReplaceAll(tweet.FullText, "<br /><br />", " \n ")
+			tweetText = strip.StripTags(tweetText)
+			words := strings.Split(tweetText, " ")
+			for _, word := range words {
+				if strings.Contains(word, "\n") {
+					height += 28
+					lineWidth = 0
+					continue
+				}
 
-			if tweet.InReplyToScreenName != "" {
-				height += 45
+				chars := strings.Split(word, "")
+				wordWidth := 0.0
+				for _, char := range chars {
+					wordWidth += getCharWidth(char)
+				}
+
+				if lineWidth+wordWidth > 443 {
+					height += 28
+					lineWidth = wordWidth
+				} else {
+					lineWidth += wordWidth
+				}
+			}
+			if lineWidth > 0 {
+				height += 28
 			}
 
-			height += float64(strings.Count(tweet.FullText, "<br />") * 20)
+			if tweet.InReplyToScreenName != "" {
+				height += 34
+			}
 
-			for _, pic := range tweet.ExtendedEntities.Media {
-				ratio := float64(pic.Sizes.Small.W) / 464
-				height += float64(pic.Sizes.Small.H) / ratio
+			height += float64(strings.Count(tweet.FullText, "<br /><br />") * 28)
+
+			if len(tweet.ExtendedEntities.Media) >= 1 {
+				ratio := float64(tweet.ExtendedEntities.Media[0].Sizes.Small.W) / 464
+				height += (float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H) / ratio) + 5
+			}
+
+			if len(tweet.ExtendedEntities.Media) > 1 {
+				for i := range tweet.ExtendedEntities.Media {
+					tweet.ExtendedEntities.Media[i].Sizes.Small.W = 225
+				}
 			}
 
 			return fmt.Sprintf("%dpx", int64(height))
