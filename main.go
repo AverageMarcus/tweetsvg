@@ -162,7 +162,11 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 
 			if len(tweet.ExtendedEntities.Media) >= 1 {
 				ratio := float64(tweet.ExtendedEntities.Media[0].Sizes.Small.W) / 464
-				height += (float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H) / ratio) + 5
+				if len(tweet.ExtendedEntities.Media) == 2 {
+					height += ((float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H) / ratio) + 5) / 2
+				} else {
+					height += (float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H) / ratio) + 5
+				}
 			}
 
 			if len(tweet.ExtendedEntities.Media) > 1 {
