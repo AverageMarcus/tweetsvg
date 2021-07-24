@@ -106,9 +106,11 @@
     }
 
     document.getElementById('tweetURL').addEventListener('change', function(e) {
-      let parts = e.target.value.split("/");
-      let tweetID = parts[parts.length-1];
-      loadTweet(tweetID);
+      if (e.target.value.trim() != "") {
+        let parts = e.target.value.split("/");
+        let tweetID = parts[parts.length-1];
+        loadTweet(tweetID);
+      }
     });
 
     document.getElementById('imageTagExample').addEventListener('click', function(e) {
