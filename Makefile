@@ -47,7 +47,7 @@ ci:
 
 .PHONY: release # Release the latest version of the application
 release:
-	@kubectl --namespace tweetsvg set image deployment tweetsvg web=docker.cluster.fun/averagemarcus/tweetsvg:$(SHA)
+	@kubectl --namespace tweetsvg rollout restart deployment tweetsvg
 
 .PHONY: help # Show this list of commands
 help:
