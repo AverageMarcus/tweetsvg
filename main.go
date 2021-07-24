@@ -94,6 +94,18 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	processTweet(&tweet)
+
+	w.Header().Set("Content-type", "image/svg+xml")
+	_, err = w.Write(renderTemplate(tweet, false))
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(500)
+		return
+	}
+}
+
+func processTweet(tweet *anaconda.Tweet) {
 	gr := uniseg.NewGraphemes(tweet.FullText)
 	count := 0
 	displayText := ""
@@ -109,7 +121,7 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 		tweet.FullText = strings.ReplaceAll(tweet.FullText, "@"+user.Screen_name, fmt.Sprintf("<a rel=\"noopener\" target=\"_blank\" href=\"https://twitter.com/%s/\">@%s</a>", user.Screen_name, user.Screen_name))
 	}
 	for _, url := range tweet.Entities.Urls {
-		tweet.FullText = strings.ReplaceAll(tweet.FullText, url.Url, fmt.Sprintf("<a rel=\"noopener\" target=\"_blank\" href=\"https://twitter.com/%s/\">%s</a>", url.Expanded_url, url.Display_url))
+		tweet.FullText = strings.ReplaceAll(tweet.FullText, url.Url, fmt.Sprintf("<a rel=\"noopener\" target=\"_blank\" href=\"%s\">%s</a>", url.Expanded_url, url.Display_url))
 	}
 	for _, hashtag := range tweet.Entities.Hashtags {
 		tweet.FullText = strings.ReplaceAll(tweet.FullText, "#"+hashtag.Text, fmt.Sprintf("<a rel=\"noopener\" target=\"_blank\" href=\"https://twitter.com/hashtag/%s\">#%s</a>", hashtag.Text, hashtag.Text))
@@ -117,6 +129,13 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 
 	tweet.FullText = strings.ReplaceAll(tweet.FullText, "\n", "<br />")
 
+	if tweet.QuotedStatus != nil {
+		processTweet(tweet.QuotedStatus)
+	}
+
+}
+
+func renderTemplate(tweet anaconda.Tweet, isQuoted bool) []byte {
 	templateFuncs := template.FuncMap{
 		"base64": func(url string) string {
 			res, err := http.Get(url)
@@ -139,79 +158,22 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 			return template.HTML(in)
 		},
 		"calculateHeight": func(tweet anaconda.Tweet) string {
-			height := 64.0 /* Avatar */ + 20 /* footer */ + 46 /* text margin */ + 22 /* margin */
-
-			lineWidth := 0.0
-			lineHeight := 28.0
-			tweetText := strings.ReplaceAll(tweet.FullText, "<br />", " \n")
-			tweetText = strip.StripTags(tweetText)
-			words := regexp.MustCompile(`[ |-]`).Split(tweetText, -1)
-			for _, word := range words {
-				if len(emoji.FindAll(word)) > 0 {
-					lineHeight = 32.0
-				}
-
-				if strings.Contains(word, "\n") {
-					height += lineHeight
-					lineHeight = 28.0
-					lineWidth = 0
-					continue
-				}
-
-				chars := strings.Split(word, "")
-				wordWidth := 0.0
-				for _, char := range chars {
-					wordWidth += getCharWidth(char)
-				}
-
-				if wordWidth > 435 {
-					height += (lineHeight * (math.Ceil(wordWidth/435) + 1))
-					lineHeight = 28.0
-					lineWidth = 0
-				} else if lineWidth+getCharWidth(" ")+wordWidth > 435 {
-					height += lineHeight
-					lineHeight = 28.0
-					lineWidth = wordWidth
-				} else {
-					lineWidth += wordWidth
-				}
+			return fmt.Sprintf("%dpx", calculateHeight(tweet))
+		},
+		"renderTweet": func(tweet anaconda.Tweet) template.HTML {
+			return template.HTML(string(renderTemplate(tweet, true)))
+		},
+		"tweetWidth": func() string {
+			if isQuoted {
+				return "450px"
 			}
-			if lineWidth > 0 {
-				height += lineHeight
+			return "499px"
+		},
+		"className": func() string {
+			if isQuoted {
+				return "subtweet"
 			}
-
-			if tweet.InReplyToScreenName != "" {
-				height += 42
-			}
-
-			for i, img := range tweet.ExtendedEntities.Media {
-				ratio := float64(img.Sizes.Small.W) / 468
-				tweet.ExtendedEntities.Media[i].Sizes.Small.W = 468
-				tweet.ExtendedEntities.Media[i].Sizes.Small.H = int((float64(img.Sizes.Small.H) / ratio) + 5.0)
-			}
-
-			if len(tweet.ExtendedEntities.Media) > 1 {
-				for i, img := range tweet.ExtendedEntities.Media {
-					tweet.ExtendedEntities.Media[i].Sizes.Small.W = (img.Sizes.Small.W / 2) - 20
-					tweet.ExtendedEntities.Media[i].Sizes.Small.H = (img.Sizes.Small.H / 2) - 20
-				}
-			}
-
-			switch len(tweet.ExtendedEntities.Media) {
-			case 1:
-				height += float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H)
-			case 2:
-				height += math.Max(float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[1].Sizes.Small.H)) + 5
-			case 3:
-				height += math.Max(float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[1].Sizes.Small.H)) + 5
-				height += float64(tweet.ExtendedEntities.Media[2].Sizes.Small.H) + 35
-			case 4:
-				height += math.Max(float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[1].Sizes.Small.H)) + 10
-				height += math.Max(float64(tweet.ExtendedEntities.Media[2].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[3].Sizes.Small.H)) + 10
-				height += 7
-			}
-
-			return fmt.Sprintf("%dpx", int64(height))
+			return "tweetsvg"
 		},
 	}
 
@@ -220,13 +182,90 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 			Funcs(templateFuncs).
 			ParseFS(content, "tweet.svg.tmpl"))
 
-	w.Header().Set("Content-type", "image/svg+xml")
-	err = t.Execute(w, tweet)
-	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(500)
-		return
+	var buf bytes.Buffer
+	t.Execute(&buf, tweet)
+
+	return buf.Bytes()
+}
+
+func calculateHeight(tweet anaconda.Tweet) int64 {
+	height := 64.0 /* Avatar */ + 20 /* footer */ + 46 /* text margin */ + 22 /* margin */
+
+	lineWidth := 0.0
+	lineHeight := 28.0
+	tweetText := strings.ReplaceAll(tweet.FullText, "<br />", " \n")
+	tweetText = strip.StripTags(tweetText)
+	words := regexp.MustCompile(`[ |-]`).Split(tweetText, -1)
+	for _, word := range words {
+		if len(emoji.FindAll(word)) > 0 {
+			lineHeight = 32.0
+		}
+
+		if strings.Contains(word, "\n") {
+			height += lineHeight
+			lineHeight = 28.0
+			lineWidth = 0
+			continue
+		}
+
+		chars := strings.Split(word, "")
+		wordWidth := 0.0
+		for _, char := range chars {
+			wordWidth += getCharWidth(char)
+		}
+
+		if wordWidth > 435 {
+			height += (lineHeight * (math.Ceil(wordWidth/435) + 1))
+			lineHeight = 28.0
+			lineWidth = 0
+		} else if lineWidth+getCharWidth(" ")+wordWidth > 435 {
+			height += lineHeight
+			lineHeight = 28.0
+			lineWidth = wordWidth
+		} else {
+			lineWidth += wordWidth
+		}
 	}
+	if lineWidth > 0 {
+		height += lineHeight
+	}
+
+	if tweet.InReplyToScreenName != "" {
+		height += 42
+	}
+
+	for i, img := range tweet.ExtendedEntities.Media {
+		ratio := float64(img.Sizes.Small.W) / 468
+		tweet.ExtendedEntities.Media[i].Sizes.Small.W = 468
+		tweet.ExtendedEntities.Media[i].Sizes.Small.H = int((float64(img.Sizes.Small.H) / ratio) + 5.0)
+	}
+
+	if len(tweet.ExtendedEntities.Media) > 1 {
+		for i, img := range tweet.ExtendedEntities.Media {
+			tweet.ExtendedEntities.Media[i].Sizes.Small.W = (img.Sizes.Small.W / 2) - 20
+			tweet.ExtendedEntities.Media[i].Sizes.Small.H = (img.Sizes.Small.H / 2) - 20
+		}
+	}
+
+	switch len(tweet.ExtendedEntities.Media) {
+	case 1:
+		height += float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H)
+	case 2:
+		height += math.Max(float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[1].Sizes.Small.H)) + 5
+	case 3:
+		height += math.Max(float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[1].Sizes.Small.H)) + 5
+		height += float64(tweet.ExtendedEntities.Media[2].Sizes.Small.H) + 35
+	case 4:
+		height += math.Max(float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[1].Sizes.Small.H)) + 10
+		height += math.Max(float64(tweet.ExtendedEntities.Media[2].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[3].Sizes.Small.H)) + 10
+		height += 7
+	}
+
+	if tweet.QuotedStatus != nil {
+		height += float64(calculateHeight(*tweet.QuotedStatus)) + 9
+	}
+
+	return int64(height)
 }
 
 func suspendedTweet(w http.ResponseWriter) {
