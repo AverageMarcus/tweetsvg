@@ -19,7 +19,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-//go:embed index.html tweet.svg.tmpl
+//go:embed index.html tweet.svg.tmpl suspendedTweet.svg
 
 var content embed.FS
 
@@ -77,6 +77,15 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 	}
 	tweet, err := api.GetTweet(i, nil)
 	if err != nil {
+		switch err := err.(type) {
+		case *anaconda.ApiError:
+			switch err.Decoded.Errors[0].Code {
+			case 63:
+				fmt.Printf("Generating suspended tweet image for %s\n", id)
+				suspendedTweet(w)
+				return
+			}
+		}
 		w.WriteHeader(404)
 		return
 	}
@@ -191,4 +200,10 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 		return
 	}
+}
+
+func suspendedTweet(w http.ResponseWriter) {
+	w.Header().Set("Content-type", "image/svg+xml")
+	tweet, _ := content.ReadFile("suspendedTweet.svg")
+	w.Write(tweet)
 }
