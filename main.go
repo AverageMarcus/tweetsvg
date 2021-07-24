@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"regexp"
@@ -17,6 +18,8 @@ import (
 	"github.com/ChimeraCoder/anaconda"
 	strip "github.com/grokify/html-strip-tags-go"
 	"github.com/joho/godotenv"
+	"github.com/rivo/uniseg"
+	emoji "github.com/tmdvs/Go-Emoji-Utils"
 )
 
 //go:embed index.html tweet.svg.tmpl suspendedTweet.svg
@@ -86,18 +89,21 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+		fmt.Println(err)
 		w.WriteHeader(404)
 		return
 	}
 
-	re := regexp.MustCompile(`[\x{1F300}-\x{1F6FF}]`)
-	emojis := re.FindAllString(tweet.FullText, -1)
-
-	emojiCount := 0
-	for _, emoji := range emojis {
-		emojiCount += len([]byte(emoji)) - 1
+	gr := uniseg.NewGraphemes(tweet.FullText)
+	count := 0
+	displayText := ""
+	for gr.Next() {
+		if count >= tweet.DisplayTextRange[0] && count < tweet.DisplayTextRange[1] {
+			displayText += gr.Str()
+		}
+		count += 1
 	}
-	tweet.FullText = tweet.FullText[tweet.DisplayTextRange[0] : tweet.DisplayTextRange[1]+emojiCount]
+	tweet.FullText = displayText
 
 	for _, user := range tweet.Entities.User_mentions {
 		tweet.FullText = strings.ReplaceAll(tweet.FullText, "@"+user.Screen_name, fmt.Sprintf("<a rel=\"noopener\" target=\"_blank\" href=\"https://twitter.com/%s/\">@%s</a>", user.Screen_name, user.Screen_name))
@@ -133,15 +139,21 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 			return template.HTML(in)
 		},
 		"calculateHeight": func(tweet anaconda.Tweet) string {
-			height := 64.0 /* Avatar */ + 20 /* footer */ + 46 /* test margin */ + 32 /* margin */
+			height := 64.0 /* Avatar */ + 20 /* footer */ + 46 /* text margin */ + 22 /* margin */
 
 			lineWidth := 0.0
-			tweetText := strings.ReplaceAll(tweet.FullText, "<br /><br />", " \n ")
+			lineHeight := 28.0
+			tweetText := strings.ReplaceAll(tweet.FullText, "<br />", " \n")
 			tweetText = strip.StripTags(tweetText)
-			words := strings.Split(tweetText, " ")
+			words := regexp.MustCompile(`[ |-]`).Split(tweetText, -1)
 			for _, word := range words {
+				if len(emoji.FindAll(word)) > 0 {
+					lineHeight = 32.0
+				}
+
 				if strings.Contains(word, "\n") {
-					height += 28
+					height += lineHeight
+					lineHeight = 28.0
 					lineWidth = 0
 					continue
 				}
@@ -152,36 +164,51 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 					wordWidth += getCharWidth(char)
 				}
 
-				if lineWidth+wordWidth > 443 {
-					height += 28
+				if wordWidth > 435 {
+					height += (lineHeight * (math.Ceil(wordWidth/435) + 1))
+					lineHeight = 28.0
+					lineWidth = 0
+				} else if lineWidth+getCharWidth(" ")+wordWidth > 435 {
+					height += lineHeight
+					lineHeight = 28.0
 					lineWidth = wordWidth
 				} else {
 					lineWidth += wordWidth
 				}
 			}
 			if lineWidth > 0 {
-				height += 28
+				height += lineHeight
 			}
 
 			if tweet.InReplyToScreenName != "" {
-				height += 34
+				height += 42
 			}
 
-			height += float64(strings.Count(tweet.FullText, "<br /><br />") * 28)
-
-			if len(tweet.ExtendedEntities.Media) >= 1 {
-				ratio := float64(tweet.ExtendedEntities.Media[0].Sizes.Small.W) / 464
-				if len(tweet.ExtendedEntities.Media) == 2 {
-					height += ((float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H) / ratio) + 5) / 2
-				} else {
-					height += (float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H) / ratio) + 5
-				}
+			for i, img := range tweet.ExtendedEntities.Media {
+				ratio := float64(img.Sizes.Small.W) / 468
+				tweet.ExtendedEntities.Media[i].Sizes.Small.W = 468
+				tweet.ExtendedEntities.Media[i].Sizes.Small.H = int((float64(img.Sizes.Small.H) / ratio) + 5.0)
 			}
 
 			if len(tweet.ExtendedEntities.Media) > 1 {
-				for i := range tweet.ExtendedEntities.Media {
-					tweet.ExtendedEntities.Media[i].Sizes.Small.W = 225
+				for i, img := range tweet.ExtendedEntities.Media {
+					tweet.ExtendedEntities.Media[i].Sizes.Small.W = (img.Sizes.Small.W / 2) - 20
+					tweet.ExtendedEntities.Media[i].Sizes.Small.H = (img.Sizes.Small.H / 2) - 20
 				}
+			}
+
+			switch len(tweet.ExtendedEntities.Media) {
+			case 1:
+				height += float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H)
+			case 2:
+				height += math.Max(float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[1].Sizes.Small.H)) + 5
+			case 3:
+				height += math.Max(float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[1].Sizes.Small.H)) + 5
+				height += float64(tweet.ExtendedEntities.Media[2].Sizes.Small.H) + 35
+			case 4:
+				height += math.Max(float64(tweet.ExtendedEntities.Media[0].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[1].Sizes.Small.H)) + 10
+				height += math.Max(float64(tweet.ExtendedEntities.Media[2].Sizes.Small.H), float64(tweet.ExtendedEntities.Media[3].Sizes.Small.H)) + 10
+				height += 7
 			}
 
 			return fmt.Sprintf("%dpx", int64(height))
