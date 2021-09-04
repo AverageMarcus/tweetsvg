@@ -18,6 +18,7 @@ import (
 	"github.com/ChimeraCoder/anaconda"
 	strip "github.com/grokify/html-strip-tags-go"
 	"github.com/joho/godotenv"
+	"github.com/patrickmn/go-cache"
 	"github.com/rivo/uniseg"
 	emoji "github.com/tmdvs/Go-Emoji-Utils"
 )
@@ -36,6 +37,8 @@ var (
 	accessTokenSecret string
 	consumerKey       string
 	consumerSecret    string
+
+	ch *cache.Cache
 )
 
 func init() {
@@ -46,6 +49,8 @@ func init() {
 	accessTokenSecret = os.Getenv("ACCESS_TOKEN_SECRET")
 	consumerKey = os.Getenv("CONSUMER_KEY")
 	consumerSecret = os.Getenv("CONSUMER_SECRET")
+
+	ch = cache.New(24*time.Hour, 48*time.Hour)
 }
 
 func main() {
@@ -78,26 +83,34 @@ func getTweet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		return
 	}
-	tweet, err := api.GetTweet(i, nil)
-	if err != nil {
-		switch err := err.(type) {
-		case *anaconda.ApiError:
-			switch err.Decoded.Errors[0].Code {
-			case 63:
-				fmt.Printf("Generating suspended tweet image for %s\n", id)
-				suspendedTweet(w)
-				return
+
+	result, found := ch.Get(id)
+	if !found {
+		fmt.Println("No cached tweet found, generating new...")
+		tweet, err := api.GetTweet(i, nil)
+		if err != nil {
+			switch err := err.(type) {
+			case *anaconda.ApiError:
+				switch err.Decoded.Errors[0].Code {
+				case 63:
+					fmt.Printf("Generating suspended tweet image for %s\n", id)
+					suspendedTweet(w)
+					return
+				}
 			}
+			fmt.Println(err)
+			w.WriteHeader(404)
+			return
 		}
-		fmt.Println(err)
-		w.WriteHeader(404)
-		return
+
+		processTweet(&tweet)
+
+		result = renderTemplate(tweet, false)
+		ch.Set(id, result, cache.DefaultExpiration)
 	}
 
-	processTweet(&tweet)
-
 	w.Header().Set("Content-type", "image/svg+xml")
-	_, err = w.Write(renderTemplate(tweet, false))
+	_, err = w.Write(result.([]byte))
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)
