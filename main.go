@@ -214,6 +214,12 @@ func calculateHeight(tweet anaconda.Tweet) int64 {
 			lineHeight = 32.0
 		}
 
+		if strings.HasPrefix(word, "\n") {
+			height += lineHeight
+			lineWidth = 0
+			word = strings.TrimPrefix(word, "\n")
+		}
+
 		if strings.Contains(word, "\n") {
 			height += lineHeight
 			lineHeight = 28.0
